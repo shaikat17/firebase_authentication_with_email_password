@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth'
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from 'firebase/auth'
 import app from "../../firebase/firebase.config";
 
 const auth = getAuth(app)
@@ -41,6 +41,7 @@ const Register = () => {
             setError('')
             setSuccess('User has been Created Successfully')
             event.target.reset()
+            sendVerificationEmail(loggedUser)
         })
         .catch(error => {
             console.log(error.message)
@@ -48,6 +49,14 @@ const Register = () => {
             setSuccess('')
         })
 
+    }
+
+    const sendVerificationEmail = (user) => {
+        sendEmailVerification(user)
+            .then(result => {
+                console.log(result);
+                alert('Please verify your email address')
+            })
     }
   return (
     <form onSubmit={handleSubmit}>

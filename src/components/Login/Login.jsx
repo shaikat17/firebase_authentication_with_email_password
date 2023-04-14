@@ -1,5 +1,5 @@
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import React, { useState } from 'react';
+import { getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useRef, useState } from 'react';
 import app from '../../firebase/firebase.config';
 
 const auth = getAuth(app)
@@ -7,6 +7,8 @@ const auth = getAuth(app)
 const Login = () => {
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
+
+    const emailRef = useRef('')
 
     const handleLogin = (event) => {
         event.preventDefault()
@@ -46,9 +48,26 @@ const Login = () => {
             setSuccess('')
         })
     }
+
+    const handleResetPassword = event => {
+        const email = emailRef.current.value;
+        if (!email) {
+            alert('Please provide your email address to reset password')
+            return;
+        }
+        sendPasswordResetEmail(auth, email)
+            .then(() => {
+                alert('Please check your email')
+            })
+            .catch(error => {
+                console.log(error);
+                setError(error.message)
+            })
+    }
     return (
+        <>
         <form onSubmit={handleLogin}>
-            <input type="email" name="email" placeholder="Enter Your Email" id="email" />
+            <input type="email" name="email" ref={emailRef} placeholder="Enter Your Email" id="email" />
             <br />
             <input type="password" placeholder="Enter Your Password" name="password" id="password" />
             <br />
@@ -56,6 +75,8 @@ const Login = () => {
             <p>{success}</p>
             <input type="submit" value="Login" />
         </form>
+        <button onClick={handleResetPassword}>Reset Password</button>
+        </>
     );
 };
 
